@@ -5,6 +5,7 @@ const {
   models: { User },
 } = require("./db");
 const path = require("path");
+const { userInfo } = require("os");
 
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
 
@@ -18,7 +19,10 @@ app.post("/api/auth", async (req, res, next) => {
 
 app.get("/api/auth", async (req, res, next) => {
   try {
-    res.send(await User.byToken(req.headers.authorization));
+    const user = await User.byToken(req.headers.authorization);
+    if (user) {
+      res.send(user);
+    }
   } catch (ex) {
     next(ex);
   }

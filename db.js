@@ -22,12 +22,15 @@ const SECRET_KEY = "sharpie_pen";
 
 User.byToken = async (token) => {
   try {
-    const user = await User.findByPk(token);
+    console.log("TESTING", token);
+    const userData = await jwt.verify(token, SECRET_KEY);
+    console.log("USER DATA----->", userData);
+
+    const user = await User.findByPk(userData.userId);
     if (user) {
-      console.log("TESTING");
-      const userData = jwt.verify(token, SECRET_KEY);
-      console.log("USER DATA--->", userdata);
-      return userData;
+      // console.log("USER DATA--->", userdata);
+      // console.log("XXXXXXXXXX", user);
+      return user;
     }
     const error = Error("bad credentials");
     error.status = 401;
@@ -51,10 +54,11 @@ User.authenticate = async ({ username, password }) => {
     const token = jwt.sign({ userId: user.id }, SECRET_KEY);
     // console.log(token);
     return token;
+  } else {
+    const error = Error("bad credentials");
+    error.status = 401;
+    throw error;
   }
-  const error = Error("bad credentials");
-  error.status = 401;
-  throw error;
 };
 
 const syncAndSeed = async () => {
